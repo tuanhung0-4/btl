@@ -1,0 +1,244 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --bg-color: #f4f6f8;
+    --text-color: #333;
+    --primary-blue: #0089cf;
+    --card-bg: #fff;
+    --gray-light: #f8f9fa;
+    --border-color: #e0e0e0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    padding-bottom: 80px;
+}
+
+/* Header Styles */
+.header {
+    background: #fff;
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-grow: 1;
+}
+
+.logo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+}
+
+.logo-grid div {
+    width: 10px;
+    height: 10px;
+}
+
+.logo-grid .red { background: #f25022; }
+.logo-grid .green { background: #7fba00; }
+.logo-grid .blue { background: #00a4ef; }
+.logo-grid .yellow { background: #ffb900; }
+
+.header-title {
+    font-size: 16px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.header-icons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.icon-badge {
+    position: relative;
+    font-size: 18px;
+    color: #666;
+}
+
+.badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: red;
+    color: white;
+    font-size: 9px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    background: #0089cf;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+}
+
+/* Content Styles */
+.content {
+    padding: 15px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.page-title {
+    font-size: 18px;
+    margin-bottom: 15px;
+    font-weight: 500;
+    color: #333;
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 25px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.amount-group {
+    margin-bottom: 15px;
+}
+
+.amount-label {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #444;
+    font-weight: 500;
+}
+
+.amount-value {
+    background: #f7f7f7;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: left;
+    padding-left: 20px;
+    font-size: 17px;
+    font-weight: 500;
+    min-height: 48px;
+    border: 1px solid #eee;
+    color: #555;
+}
+
+.amount-value:focus {
+    outline: none;
+    background: #fff;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 2px rgba(0,137,207,0.1);
+}
+
+/* Sections */
+.section-header {
+    color: var(--primary-blue);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    margin-top: 10px;
+}
+
+.table-container {
+    background: white;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    margin-bottom: 25px;
+    border-radius: 4px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 500px;
+}
+
+th {
+    background: var(--gray-light);
+    border: 1px solid var(--border-color);
+    padding: 12px 8px;
+    font-weight: 600;
+    text-align: center;
+    color: #444;
+}
+
+td {
+    border: 1px solid var(--border-color);
+    padding: 12px 8px;
+    text-align: right;
+    color: #555;
+    background: white;
+}
+
+tr:nth-child(even) td {
+    background: #fafafa;
+}
+
+td:first-child {
+    text-align: left;
+}
+
+/* Editable Helper */
+[contenteditable="true"] {
+    cursor: text;
+}
+
+/* Bottom Nav Bar */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    display: flex;
+    justify-content: space-around;
+    padding: 12px;
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+}
+
+.nav-icon {
+    font-size: 18px;
+    color: #555;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .header-title {
+        max-width: 100px;
+    }
+    .amount-value {
+        font-size: 15px;
+    }
+}
