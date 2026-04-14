@@ -12,6 +12,21 @@ class CoffeeShopSeeder extends Seeder
 {
     public function run(): void
     {
+        // 0. Users
+        \App\Models\User::create([
+            'name' => 'Admin Coffee',
+            'email' => 'admin@coffee.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('password'),
+            'role' => 'admin',
+        ]);
+
+        \App\Models\User::create([
+            'name' => 'Staff Coffee',
+            'email' => 'staff@coffee.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('password'),
+            'role' => 'staff',
+        ]);
+
         // 1. Categories
         $categories = ['Cà phê', 'Trà trái cây', 'Đá xay', 'Bánh ngọt'];
         foreach ($categories as $cat) {

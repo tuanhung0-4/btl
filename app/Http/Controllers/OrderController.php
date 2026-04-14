@@ -7,14 +7,41 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Table;
 use App\Models\OrderItem;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with('table')->latest()->paginate(15);
+        $query = Order::with('table');
+
+        // Filter by date
+        if ($request->filled('date')) {
+            $query->whereDate('created_at', $request->date);
+        }
+
+        // Filter by date range
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [
+                Carbon::parse($request->start_date)->startOfDay(),
+                Carbon::parse($request->end_date)->endOfDay()
+            ]);
+        }
+
+        // Search by ID (Exact match for numeric, like search for string if applicable)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            if (is_numeric($search)) {
+                $query->where('id', $search);
+            } else {
+                $query->where('id', 'like', "%$search%");
+            }
+        }
+
+        $orders = $query->latest()->paginate(15)->withQueryString();
         return view('orders.index', compact('orders'));
     }
 
@@ -22,7 +49,7 @@ class OrderController extends Controller
     {
         $tables = Table::all();
         $products = Product::available()->with('category')->get();
-        $categories = \App\Models\Category::all();
+        $categories = Category::all();
         return view('orders.create', compact('tables', 'products', 'categories'));
     }
 
@@ -54,6 +81,8 @@ class OrderController extends Controller
 
             $order = Order::create([
                 'table_id' => $request->table_id,
+                'customer_name' => $request->customer_name,
+                'customer_phone' => $request->customer_phone,
                 'total_amount' => $totalAmount,
                 'status' => 'pending'
             ]);
@@ -80,6 +109,62 @@ class OrderController extends Controller
         return view('orders.show', compact('order'));
     }
 
+    public function edit(Order $order)
+    {
+        if ($order->status !== 'pending') {
+            return redirect()->route('orders.show', $order->id)->with('error', 'Không thể sửa đơn hàng đã hoàn tất hoặc đã hủy.');
+        }
+
+        $tables = Table::all();
+        $products = Product::available()->with('category')->get();
+        $categories = Category::all();
+        $order->load('orderItems');
+        
+        return view('orders.edit', compact('order', 'tables', 'products', 'categories'));
+    }
+
+    public function update(Request $request, Order $order)
+    {
+        if ($order->status !== 'pending') {
+            return redirect()->route('orders.show', $order->id)->with('error', 'Không thể sửa đơn hàng đã hoàn tất hoặc đã hủy.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Clear old items
+            $order->orderItems()->delete();
+
+            $totalAmount = 0;
+            foreach ($request->products as $item) {
+                if ($item['quantity'] <= 0) continue;
+
+                $product = Product::findOrFail($item['id']);
+                $subtotal = $product->price * $item['quantity'];
+                $totalAmount += $subtotal;
+
+                $order->orderItems()->create([
+                    'product_id' => $product->id,
+                    'quantity' => $item['quantity'],
+                    'price' => $product->price
+                ]);
+            }
+
+            $order->update([
+                'table_id' => $request->table_id,
+                'customer_name' => $request->customer_name,
+                'customer_phone' => $request->customer_phone,
+                'total_amount' => $totalAmount,
+            ]);
+
+            DB::commit();
+            return redirect()->route('orders.show', $order->id)->with('success', 'Cập nhật đơn hàng thành công!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
+
     public function complete(Order $order)
     {
         $order->update(['status' => 'completed']);
@@ -94,5 +179,14 @@ class OrderController extends Controller
         $order->table->update(['status' => 'empty']);
         
         return redirect()->route('orders.index')->with('success', 'Đơn hàng đã được hủy!');
+    }
+
+    public function destroy(Order $order)
+    {
+        if ($order->status === 'pending') {
+            $order->table->update(['status' => 'empty']);
+        }
+        $order->delete();
+        return redirect()->route('orders.index')->with('success', 'Đã xóa đơn hàng!');
     }
 }

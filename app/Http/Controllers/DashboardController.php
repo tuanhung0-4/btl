@@ -9,6 +9,7 @@ use App\Models\Table;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -55,42 +56,54 @@ class DashboardController extends Controller
 
     public function statistics(Request $request)
     {
-        $startDate = $request->get('start_date', now()->subDays(6)->format('Y-m-d'));
-        $endDate = $request->get('end_date', now()->format('Y-m-d'));
-
-        // Revenue by day for Chart
-        $revenueData = Order::where('status', 'completed')
-            ->whereBetween('updated_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-            ->select(DB::raw('DATE(updated_at) as date'), DB::raw('SUM(total_amount) as total'))
-            ->groupBy('date')
-            ->orderBy('date')
+        $year = $request->get('year', date('Y'));
+        
+        // 1. Revenue Statistics (Month, Quarter, Year)
+        $monthlyRevenue = Order::where('status', 'completed')
+            ->whereYear('updated_at', $year)
+            ->select(DB::raw('MONTH(updated_at) as month'), DB::raw('SUM(total_amount) as total'))
+            ->groupBy('month')
+            ->orderBy('month')
             ->get();
 
-        $chartLabels = [];
-        $chartValues = [];
-        
-        // Fill missing dates with 0
-        $current = \Carbon\Carbon::parse($startDate);
-        $end = \Carbon\Carbon::parse($endDate);
-        while ($current->lte($end)) {
-            $dateStr = $current->format('Y-m-d');
-            $chartLabels[] = $current->format('d/m');
-            $dayRevenue = $revenueData->firstWhere('date', $dateStr);
-            $chartValues[] = $dayRevenue ? $dayRevenue->total : 0;
-            $current->addDay();
-        }
+        $quarterlyRevenue = Order::where('status', 'completed')
+            ->whereYear('updated_at', $year)
+            ->select(DB::raw('QUARTER(updated_at) as quarter'), DB::raw('SUM(total_amount) as total'))
+            ->groupBy('quarter')
+            ->orderBy('quarter')
+            ->get();
 
-        // Top Selling Products
-        $bestSellers = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_sold'))
+        $yearlyRevenue = Order::where('status', 'completed')
+            ->whereYear('updated_at', $year)
+            ->sum('total_amount');
+
+        // 2. Product Statistics (Quantity Sold + Best Sellers)
+        $productStats = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_sold'), DB::raw('SUM(quantity * order_items.price) as total_revenue'))
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->where('orders.status', 'completed')
-            ->whereBetween('orders.updated_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->whereYear('orders.updated_at', $year)
             ->groupBy('product_id')
             ->orderByDesc('total_sold')
-            ->take(10)
             ->with('product')
             ->get();
 
-        return view('statistics.index', compact('chartLabels', 'chartValues', 'bestSellers', 'startDate', 'endDate'));
+        // 3. Potential Customers (Based on name/phone since we don't have separate table)
+        // Analyzing "customer_name" or "customer_phone"
+        $topCustomers = Order::where('status', 'completed')
+            ->whereNotNull('customer_name')
+            ->select('customer_name', 'customer_phone', DB::raw('COUNT(*) as total_orders'), DB::raw('SUM(total_amount) as total_spent'))
+            ->groupBy('customer_name', 'customer_phone')
+            ->orderByDesc('total_spent')
+            ->take(10)
+            ->get();
+
+        return view('statistics.index', compact(
+            'monthlyRevenue', 
+            'quarterlyRevenue', 
+            'yearlyRevenue', 
+            'productStats', 
+            'topCustomers',
+            'year'
+        ));
     }
 }

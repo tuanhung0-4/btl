@@ -13,12 +13,17 @@
     </div>
 
     <div class="card" style="padding: 2rem;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #e2e8f0;">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #e2e8f0;">
             <div>
                 <p style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem;">Trạng thái đơn</p>
-                <x-badge :type="$order->status === 'completed' ? 'success' : ($order->status === 'pending' ? 'warning' : 'danger')">
+                <div style="padding: 0.4rem 1rem; border-radius: 9999px; display: inline-block; font-size: 0.8rem; font-weight: 600; background: {{ $order->status === 'completed' ? '#dcfce7' : ($order->status === 'pending' ? '#fef3c7' : '#fee2e2') }}; color: {{ $order->status === 'completed' ? '#166534' : ($order->status === 'pending' ? '#92400e' : '#991b1b') }};">
                     {{ $order->status === 'completed' ? 'Đã hoàn tất' : ($order->status === 'pending' ? 'Chưa thanh toán' : 'Đã hủy') }}
-                </x-badge>
+                </div>
+            </div>
+            <div>
+                <p style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem;">Khách hàng</p>
+                <p style="font-weight: 600;">{{ $order->customer_name ?? 'Khách vãng lai' }}</p>
+                <p style="font-size: 0.85rem; color: #64748b;">{{ $order->customer_phone ?? '---' }}</p>
             </div>
             <div style="text-align: right;">
                 <p style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem;">Thời gian</p>
@@ -58,6 +63,9 @@
 
         @if($order->status === 'pending')
         <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+            <a href="{{ route('orders.edit', $order->id) }}" class="btn" style="background: #e0e7ff; color: #4338ca; padding: 0.75rem 1.5rem; border: 1px solid #c7d2fe;">
+                <i class="fas fa-edit"></i> CẬP NHẬT MÓN
+            </a>
             <form action="{{ route('orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Bạn chắc chắn muốn hủy đơn hàng này?')">
                 @csrf
                 <button type="submit" class="btn btn-danger" style="padding: 0.75rem 1.5rem;">

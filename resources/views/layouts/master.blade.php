@@ -215,12 +215,20 @@
                     <span>Tổng quan</span>
                 </a>
             </li>
+            @if(Auth::user()->role === 'admin')
+            <li class="nav-item">
+                <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                    <i class="fas fa-users-cog"></i>
+                    <span>Quản lý tài khoản</span>
+                </a>
+            </li>
             <li class="nav-item">
                 <a href="{{ route('categories.index') }}" class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
                     <i class="fas fa-tags"></i>
                     <span>Danh mục</span>
                 </a>
             </li>
+            @endif
             <li class="nav-item">
                 <a href="{{ route('products.index') }}" class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">
                     <i class="fas fa-mug-hot"></i>
@@ -239,15 +247,20 @@
                     <span>Đơn hàng</span>
                 </a>
             </li>
+            @if(Auth::user()->role === 'admin')
             <li class="nav-item">
                 <a href="{{ route('statistics') }}" class="nav-link {{ request()->routeIs('statistics') ? 'active' : '' }}">
                     <i class="fas fa-chart-bar"></i>
                     <span>Thống kê doanh thu</span>
                 </a>
             </li>
+            @endif
         </ul>
         <div style="margin-top: auto;">
-            <a href="#" class="nav-link">
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
+            <a href="#" class="nav-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Đăng xuất</span>
             </a>
@@ -258,8 +271,11 @@
         <header>
             <h2 id="page-title">Coffee Manager</h2>
             <div style="display: flex; align-items: center; gap: 1rem;">
-                <span>Chào, Admin</span>
-                <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" style="width: 40px; border-radius: 50%;">
+                <div style="text-align: right;">
+                    <div style="font-weight: 600;">{{ Auth::user()->name }}</div>
+                    <div style="font-size: 0.75rem; color: var(--secondary);">{{ Auth::user()->role === 'admin' ? 'Quản trị viên' : 'Nhân viên' }}</div>
+                </div>
+                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=6366f1&color=fff" style="width: 40px; border-radius: 50%;">
             </div>
         </header>
 

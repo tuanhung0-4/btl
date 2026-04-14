@@ -9,7 +9,17 @@
         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
             <!-- Cột trái: Chọn bàn -->
             <div class="card">
-                <h4 style="margin-bottom: 1.5rem; font-weight: 600;">1. Chọn bàn trống</h4>
+                <h4 style="margin-bottom: 1.5rem; font-weight: 600;">1. Thông tin khách hàng</h4>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.4rem; font-size: 0.85rem; color: #64748b;">Tên khách hàng</label>
+                    <input type="text" name="customer_name" placeholder="Ví dụ: Anh Tuấn" style="width: 100%; padding: 0.6rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; outline: none;">
+                </div>
+                <div style="margin-bottom: 2rem;">
+                    <label style="display: block; margin-bottom: 0.4rem; font-size: 0.85rem; color: #64748b;">Số điện thoại</label>
+                    <input type="text" name="customer_phone" placeholder="090..." style="width: 100%; padding: 0.6rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; outline: none;">
+                </div>
+
+                <h4 style="margin-bottom: 1.5rem; font-weight: 600;">2. Chọn bàn trống</h4>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     @foreach($tables as $table)
                     <label style="{{ $table->status === 'occupied' ? 'opacity: 0.5; cursor: not-allowed;' : 'cursor: pointer;' }}">
@@ -18,7 +28,7 @@
                             <i class="fas fa-couch" style="display: block; margin-bottom: 0.5rem; color: {{ $table->status === 'occupied' ? 'var(--danger)' : 'var(--success)' }};"></i>
                             <span style="font-weight: 500;">{{ $table->name }}</span>
                             @if($table->status === 'occupied')
-                                <div style="font-size: 0.65rem; color: var(--danger); font-weight: 600;">ĐANG CÓ KHÁCH</div>
+                                <div style="font-size: 0.65rem; color: var(--danger); font-weight: 600;">BẬN</div>
                             @endif
                         </div>
                     </label>
