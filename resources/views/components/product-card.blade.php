@@ -16,8 +16,8 @@
     @endif
 
     <div style="height: 180px; background: #f1f5f9; position: relative;">
-        @if($product->image)
-            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+        @if($product->image_url)
+            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" style="width: 100%; height: 100%; object-fit: cover;">
         @else
             <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
                 <i class="fas fa-image fa-3x"></i>

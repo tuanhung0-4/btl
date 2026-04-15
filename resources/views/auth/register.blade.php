@@ -8,11 +8,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --dark: #0f172a;
-            --light: #f8fafc;
-            --glass: rgba(255, 255, 255, 0.9);
+            --primary: #008080;
+            --primary-light: #4db6ac;
+            --secondary: #00ced1;
+            --vibrant-cyan: #00fbff;
+            --dark: #002b2b;
+            --light: #e0f2f1;
+            --white: #ffffff;
         }
 
         * {
@@ -23,44 +25,38 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            overflow: hidden;
             position: relative;
+            overflow: hidden;
         }
 
-        .circle {
+        /* Decorative Background */
+        body::before {
+            content: "";
             position: absolute;
-            border-radius: 50%;
-            background: linear-gradient(to right, var(--primary), #a855f7);
-            filter: blur(80px);
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 251, 255, 0.1) 0%, transparent 70%);
             z-index: 0;
-            opacity: 0.4;
         }
-
-        .circle-1 { width: 400px; height: 400px; top: -100px; left: -100px; }
-        .circle-2 { width: 300px; height: 300px; bottom: -50px; right: -50px; background: #ec4899; }
 
         .register-card {
-            background: var(--glass);
+            background: rgba(255, 255, 255, 0.95);
             width: 100%;
-            max-width: 480px;
-            padding: 2.5rem;
-            border-radius: 2rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
+            max-width: 500px;
+            padding: 3rem 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 43, 43, 0.5);
             z-index: 10;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            border: 1px solid rgba(0, 251, 255, 0.2);
+            position: relative;
         }
 
         .brand {
@@ -69,15 +65,18 @@
         }
 
         .brand i {
-            font-size: 2.5rem;
+            font-size: 3rem;
             color: var(--primary);
             margin-bottom: 0.5rem;
+            filter: drop-shadow(0 0 10px rgba(0, 251, 255, 0.4));
         }
 
         .brand h1 {
-            font-size: 1.6rem;
-            font-weight: 700;
+            font-size: 1.8rem;
+            font-weight: 800;
             color: var(--dark);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .form-group {
@@ -87,9 +86,11 @@
         .form-label {
             display: block;
             margin-bottom: 0.4rem;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #64748b;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .input-group {
@@ -98,66 +99,72 @@
 
         .input-group i {
             position: absolute;
-            left: 1rem;
+            left: 1.25rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #94a3b8;
-            transition: color 0.3s;
+            color: var(--primary-light);
+            transition: all 0.3s;
         }
 
         .form-control {
             width: 100%;
-            padding: 0.8rem 1rem 0.8rem 2.8rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.8rem;
+            padding: 0.85rem 1rem 0.85rem 3.2rem;
+            border: 2px solid #e0f2f1;
+            border-radius: 0.75rem;
             font-size: 0.95rem;
             outline: none;
             transition: all 0.3s;
-            background: white;
+            background: #f8fafc;
+            color: var(--dark);
         }
 
         .form-control:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            background: white;
+            box-shadow: 0 0 20px rgba(0, 128, 128, 0.1);
         }
 
         .form-control:focus + i {
-            color: var(--primary);
+            color: var(--secondary);
+            transform: translateY(-50%) scale(1.1);
         }
 
         .btn-register {
             width: 100%;
-            padding: 0.9rem;
-            background: var(--primary);
+            padding: 1rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             color: white;
             border: none;
-            border-radius: 0.8rem;
+            border-radius: 0.75rem;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
             transition: all 0.3s;
-            margin-top: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
+            margin-top: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 128, 128, 0.3);
         }
 
         .btn-register:hover {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -5px rgba(0, 128, 128, 0.4);
+            filter: brightness(1.1);
         }
 
         .error-message {
-            background: #fee2e2;
-            color: #991b1b;
+            background: #ffebee;
+            color: #c62828;
             padding: 0.8rem;
-            border-radius: 0.6rem;
-            font-size: 0.85rem;
+            border-radius: 0.75rem;
+            font-size: 0.8rem;
             margin-bottom: 1.5rem;
-            border-left: 4px solid #ef4444;
+            border: 1px solid #ffcdd2;
+            font-weight: 500;
         }
 
         .footer {
-            margin-top: 1.5rem;
+            margin-top: 2rem;
             text-align: center;
             font-size: 0.9rem;
             color: #64748b;
@@ -166,7 +173,13 @@
         .footer a {
             color: var(--primary);
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 700;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .footer a:hover {
+            border-bottom-color: var(--primary);
         }
     </style>
 </head>

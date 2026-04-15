@@ -1,21 +1,23 @@
-# GIẢI THÍCH CODE CHÍNH (KEY CONCEPTS)
+# GIẢI THÍCH CODE CHÍNH (KEY CONCEPTS) - QUẢN LÝ QUÁN CAFE
 
 ## 1. Quan hệ dữ liệu (Relationship)
 
 Trong ứng dụng, các quan hệ được định nghĩa trong các `Models` (thư mục `app/Models`):
 
-- **Course (1-N) Lesson**: Một khóa học có nhiều bài học. Dùng `hasMany` trong `Course.php` và `belongsTo` trong `Lesson.php`.
+- **Category (1-N) Product**: Một danh mục (Cà phê, Trà...) có nhiều sản phẩm. Dùng `hasMany` trong `Category.php` và `belongsTo` trong `Product.php`.
     ```php
-    public function lessons() {
-        return $this->hasMany(Lesson::class)->orderBy('order');
+    public function products() {
+        return $this->hasMany(Product::class);
     }
     ```
-- **Course (1-N) Enrollment**: Một khóa học có nhiều bản ghi đăng ký.
-- **Student (1-N) Enrollment**: Một học viên có nhiều bản ghi đăng ký (đăng ký nhiều khóa học).
-- **Course (Many-to-Many) Student**: Quan hệ giữa khóa học và học viên thông qua bảng trung gian `enrollments`. Dùng `belongsToMany`.
+- **Table (1-N) Order**: Một bàn có thể có nhiều đơn hàng (theo thời gian). Một đơn hàng hiện tại thuộc về một bàn.
+- **Order (1-N) OrderItem**: Một hóa đơn có nhiều chi tiết món ăn.
+- **Product (1-N) OrderItem**: Một sản phẩm có thể xuất hiện trong nhiều chi tiết hóa đơn khác nhau.
+- **Order (Many-to-Many) Product**: Quan hệ giữa hóa đơn và sản phẩm thông qua bảng trung gian `order_items`.
     ```php
-    public function students() {
-        return $this->belongsToMany(Student::class, 'enrollments');
+    public function products() {
+        return $this->belongsToMany(Product::class, 'order_items')
+                    ->withPivot('quantity', 'price');
     }
     ```
 
@@ -23,42 +25,36 @@ Trong ứng dụng, các quan hệ được định nghĩa trong các `Models` (
 
 ## 2. Kiểm soát dữ liệu (Validation)
 
-Chúng ta sử dụng **Form Request** để tách biệt logic kiểm tra dữ liệu ra khỏi Controller (xem `app/Http/Requests/CourseRequest.php`):
+Sử dụng **Form Request** để đảm bảo dữ liệu đầu vào sạch (ví dụ: `app/Http/Requests/ProductRequest.php`):
 
-- **Rule `required`**: Bắt buộc nhập tên, giá, trạng thái.
-- **Rule `numeric` & `min:0.01`**: Đảm bảo giá tiền là con số và lớn hơn 0.
-- **Rule `image`**: Kiểm tra định dạng file và dung lượng ảnh (tối đa 2MB).
-- **Rule `unique:courses,slug`**: Đảm bảo đường dẫn slug không bị trùng lặp.
-    - *Lưu ý*: Khi cập nhật, chúng ta sử dụng `slug,id` để bỏ qua việc kiểm tra trùng lặp với chính bản ghi đang sửa.
-    ```php
-    'slug' => 'nullable|string|unique:courses,slug,' . $id,
-    ```
+- **Rule `required`**: Tên sản phẩm, giá, danh mục là bắt buộc.
+- **Rule `numeric` & `min:0`**: Đảm bảo giá tiền là con số hợp lệ.
+- **Rule `image`**: Kiểm tra file ảnh tải lên đúng định dạng (jpg, png...).
 
 ---
 
 ## 3. Tối ưu hóa truy vấn (Optimization)
 
 ### Vấn đề N+1 Query
-Khi bạn lấy 10 khóa học, nếu bạn không tối ưu, mỗi khi hiển thị "Số bài học" hay "Số học viên", Laravel sẽ gọi thêm một câu SQL cho từng khóa học (10 + 10 = 20 câu SQL).
+Khi hiển thị danh sách sản phẩm kèm tên danh mục, nếu không tối ưu, Laravel sẽ gọi thêm 1 câu SQL lấy Category cho mỗi Product.
 
-### Giải pháp trong dự án:
-Trong `CourseController@index`, chúng ta sử dụng:
-1. **`withCount(['lessons', 'students'])`**: Laravel sẽ thực hiện đếm số lượng bài học và học viên trực tiếp bằng một câu SQL duy nhất bằng cách `JOIN`. Điều này cực kỳ nhanh và tiết kiệm bộ nhớ.
-2. **`with(['lessons', 'enrollments'])`**: **Eager Loading** tải sẵn dữ liệu các bảng liên quan. Dữ liệu bài học đã nằm sẵn trong bộ nhớ, khi gọi `$course->lessons` trong Blade, nó sẽ không gọi thêm SQL nữa.
-
+### Giải pháp:
+Sử dụng **Eager Loading** trong Controller:
 ```php
-Course::withCount(['lessons', 'students'])
-      ->with(['lessons', 'enrollments'])
-      ->paginate(10);
+// ProductController.php
+$products = Product::with('category')->get();
 ```
+Điều này giúp gộp các truy vấn lại, chỉ tốn 2 câu SQL thay vì N+1.
 
 ---
 
-## 4. Các Scopes & Advanced Features
-- **Soft Deletes**: Khóa học khi xóa sẽ không mất hẳn khỏi Database, cho phép "khôi phục" lại.
-- **Local Scopes**: Định nghĩa `scopePublished()` để lấy nhanh các khóa học đã được đăng.
+## 4. Các tính năng nâng cao
+- **Soft Deletes**: Sản phẩm khi xóa sẽ được đánh dấu `deleted_at`, cho phép khôi phục hoặc giữ bằng chứng lịch sử trong `orders`.
+- **Query Scopes**: 
+    - `scopeAvailable()`: Lấy nhanh các món còn hàng.
     ```php
-    public function scopePublished($query) {
-        return $query->where('status', 'published');
+    public function scopeAvailable($query) {
+        return $query->where('status', 'available');
     }
     ```
+- **Database Transactions**: Khi tạo Order và OrderItems, sử dụng `DB::beginTransaction()` để đảm bảo tính toàn vẹn dữ liệu (nếu lỗi ở bước lưu item thì order chính cũng sẽ roll back).

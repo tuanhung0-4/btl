@@ -40,4 +40,18 @@ class Product extends Model
     {
         return $query->whereBetween('price', [$min, $max]);
     }
+
+    // Accessors
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return null;
+        }
+
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
+        }
+
+        return asset('storage/' . $this->image);
+    }
 }

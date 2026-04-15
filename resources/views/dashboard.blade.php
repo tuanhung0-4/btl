@@ -2,7 +2,7 @@
 
 @section('content')
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-    <div class="card" style="margin-bottom: 0; background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); color: white;">
+    <div class="card" style="margin-bottom: 0; background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%); color: white;">
         <div style="display: flex; justify-content: space-between; align-items: start;">
             <div>
                 <p style="opacity: 0.8; font-size: 0.875rem; font-weight: 500;">Doanh thu hôm nay</p>
@@ -20,7 +20,7 @@
                 <p style="color: #64748b; font-size: 0.875rem; font-weight: 500;">Tổng đơn hàng</p>
                 <h3 style="font-size: 1.75rem; margin-top: 0.5rem; color: #1e293b;">{{ $totalOrders }}</h3>
             </div>
-            <div style="background: #f1f5f9; color: #6366f1; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+            <div style="background: var(--light); color: var(--primary); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
                 <i class="fas fa-shopping-bag fa-lg"></i>
             </div>
         </div>
@@ -81,7 +81,7 @@
                         </div>
                     </td>
                     <td>{{ $item->total_sold }}</td>
-                    <td style="font-weight: 600; color: #6366f1;">{{ number_format($item->total_sold * $item->product->price, 0, ',', '.') }}đ</td>
+                    <td style="font-weight: 600; color: var(--primary);">{{ number_format($item->total_sold * $item->product->price, 0, ',', '.') }}đ</td>
                 </tr>
                 @endforeach
             </tbody>
