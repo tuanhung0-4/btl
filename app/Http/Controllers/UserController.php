@@ -16,7 +16,8 @@ class UserController extends Controller
         if ($request->has('search')) {
             $search = $request->get('search');
             $query->where('name', 'like', "%$search%")
-                  ->orWhere('email', 'like', "%$search%");
+                  ->orWhere('email', 'like', "%$search%")
+                  ->orWhere('username', 'like', "%$search%");
         }
 
         $users = $query->latest()->paginate(10);
@@ -32,6 +33,7 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:admin,staff'],
@@ -39,6 +41,7 @@ class UserController extends Controller
 
         User::create([
             'name' => $request->name,
+            'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
@@ -56,12 +59,14 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255', 'unique:users,username,' . $user->id],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'role' => ['required', 'in:admin,staff'],
         ]);
 
         $user->update([
             'name' => $request->name,
+            'username' => $request->username,
             'email' => $request->email,
             'role' => $request->role,
         ]);

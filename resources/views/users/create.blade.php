@@ -20,6 +20,12 @@
         </div>
 
         <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Tên đăng nhập (Username)</label>
+            <input type="text" name="username" value="{{ old('username', $user->username ?? '') }}" required
+                style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; outline: none;">
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
             <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email</label>
             <input type="email" name="email" value="{{ old('email', $user->email ?? '') }}" required
                 style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; outline: none;">

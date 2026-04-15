@@ -210,10 +210,10 @@
         <form action="{{ route('login') }}" method="POST">
             @csrf
             <div class="form-group">
-                <label class="form-label">Email</label>
+                <label class="form-label">Email hoặc Tên đăng nhập</label>
                 <div class="input-group">
-                    <input type="email" name="email" class="form-control" placeholder="Email của bạn" required value="{{ old('email') }}">
-                    <i class="fas fa-envelope"></i>
+                    <input type="text" name="login" class="form-control" placeholder="Email hoặc username" required value="{{ old('login') }}">
+                    <i class="fas fa-user-circle"></i>
                 </div>
             </div>
 

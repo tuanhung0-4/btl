@@ -199,6 +199,14 @@
             </div>
 
             <div class="form-group">
+                <label class="form-label">Tên đăng nhập (Username)</label>
+                <div class="input-group">
+                    <input type="text" name="username" class="form-control" placeholder="Tên đăng nhập" required value="{{ old('username') }}">
+                    <i class="fas fa-id-badge"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label class="form-label">Email</label>
                 <div class="input-group">
                     <input type="email" name="email" class="form-control" placeholder="example@gmail.com" required value="{{ old('email') }}">

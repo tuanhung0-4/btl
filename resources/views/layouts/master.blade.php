@@ -251,7 +251,7 @@
             <li class="nav-item">
                 <a href="{{ route('statistics') }}" class="nav-link {{ request()->routeIs('statistics') ? 'active' : '' }}">
                     <i class="fas fa-chart-bar"></i>
-                    <span>Thống kê doanh thu</span>
+                    <span>Thống kê</span>
                 </a>
             </li>
             @endif
@@ -302,6 +302,8 @@
         </div>
     </div>
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @stack('scripts')
 </body>
 </html>

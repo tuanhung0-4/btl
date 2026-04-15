@@ -17,10 +17,13 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+        $loginValue = $request->input('login');
+        $field = filter_var($loginValue, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        $credentials = [
+            $field => $loginValue,
+            'password' => $request->password,
+        ];
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
@@ -29,8 +32,8 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'Thông tin đăng nhập không chính xác.',
-        ])->onlyInput('email');
+            'login' => 'Thông tin đăng nhập không chính xác.',
+        ])->onlyInput('login');
     }
 
     public function showRegister()
@@ -42,14 +45,17 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
             'name' => $request->name,
+            'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => 'staff', // Default role for registration
         ]);
 
         Auth::login($user);

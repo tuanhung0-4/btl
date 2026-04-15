@@ -3,7 +3,7 @@
 @section('content')
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
     <div>
-        <h2 style="font-size: 1.5rem; font-weight: 700;">Báo cáo & Thống kê</h2>
+        <h2 style="font-size: 1.5rem; font-weight: 700;">Thống kê</h2>
         <p style="color: #64748b; font-size: 0.875rem;">Phân tích hoạt động kinh doanh của quán.</p>
     </div>
     <form action="{{ route('statistics') }}" method="GET" style="display: flex; gap: 0.5rem; align-items: center;">
@@ -16,18 +16,27 @@
     </form>
 </div>
 
+<!-- Chart Section -->
+<div class="card" style="margin-bottom: 2rem;">
+    <h4 style="margin-bottom: 1.5rem; font-weight: 600;">Biểu đồ doanh thu & Lượng đơn tháng</h4>
+    <div style="height: 350px;">
+        <canvas id="revenueChart"></canvas>
+    </div>
+</div>
+
 <!-- Revenue Grid -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
     <!-- Monthly Revenue Card -->
     <div class="card">
         <h4 style="margin-bottom: 1.5rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-calendar-alt" style="color: var(--primary);"></i> Doanh thu theo tháng
+            <i class="fas fa-calendar-alt" style="color: var(--primary);"></i> Chi tiết theo tháng
         </h4>
         <div style="height: 300px; overflow-y: auto;">
             <table>
                 <thead>
                     <tr>
                         <th>Tháng</th>
+                        <th style="text-align: center;">Lượng đơn</th>
                         <th style="text-align: right;">Doanh thu</th>
                     </tr>
                 </thead>
@@ -36,6 +45,11 @@
                         @php $monthData = $monthlyRevenue->firstWhere('month', $m); @endphp
                         <tr>
                             <td>Tháng {{ $m }}</td>
+                            <td style="text-align: center;">
+                                <span class="badge" style="background: #e0e7ff; color: #4338ca;">
+                                    {{ $monthData ? $monthData->count : 0 }}
+                                </span>
+                            </td>
                             <td style="text-align: right; font-weight: 600;">
                                 {{ number_format($monthData ? $monthData->total : 0, 0, ',', '.') }}đ
                             </td>
@@ -123,4 +137,92 @@
         @endforelse
     </div>
 </div>
+
+@push('scripts')
+<script>
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    
+    const months = [@foreach(range(1, 12) as $m)'T{{ $m }}',@endforeach];
+    const revenueData = [@foreach(range(1, 12) as $m){{ $monthlyRevenue->firstWhere('month', $m)->total ?? 0 }},@endforeach];
+    const orderData = [@foreach(range(1, 12) as $m){{ $monthlyRevenue->firstWhere('month', $m)->count ?? 0 }},@endforeach];
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [
+                {
+                    label: 'Doanh thu (VNĐ)',
+                    data: revenueData,
+                    backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                    borderColor: 'rgb(99, 102, 241)',
+                    borderWidth: 1,
+                    yAxisID: 'y',
+                    borderRadius: 5,
+                },
+                {
+                    label: 'Lượng đơn hàng',
+                    data: orderData,
+                    backgroundColor: 'rgba(236, 72, 153, 0.5)',
+                    borderColor: 'rgb(236, 72, 153)',
+                    borderWidth: 1,
+                    type: 'line', // Mix line for orders to make it distinct
+                    yAxisID: 'y1',
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Doanh thu'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString('vi-VN') + 'đ';
+                        }
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Lượng đơn'
+                    },
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                },
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.dataset.yAxisID === 'y') {
+                                label += context.parsed.y.toLocaleString('vi-VN') + 'đ';
+                            } else {
+                                label += context.parsed.y + ' đơn';
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+@endpush
 @endsection

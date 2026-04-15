@@ -34,6 +34,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Họ và tên</th>
+                    <th>Tên đăng nhập</th>
                     <th>Email</th>
                     <th>Vai trò</th>
                     <th>Ngày tạo</th>
@@ -45,6 +46,7 @@
                 <tr>
                     <td>#{{ $user->id }}</td>
                     <td style="font-weight: 500;">{{ $user->name }}</td>
+                    <td><code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">{{ $user->username }}</code></td>
                     <td>{{ $user->email }}</td>
                     <td>
                         @if($user->role === 'admin')

@@ -61,7 +61,11 @@ class DashboardController extends Controller
         // 1. Revenue Statistics (Month, Quarter, Year)
         $monthlyRevenue = Order::where('status', 'completed')
             ->whereYear('updated_at', $year)
-            ->select(DB::raw('MONTH(updated_at) as month'), DB::raw('SUM(total_amount) as total'))
+            ->select(
+                DB::raw('MONTH(updated_at) as month'), 
+                DB::raw('SUM(total_amount) as total'),
+                DB::raw('COUNT(*) as count')
+            )
             ->groupBy('month')
             ->orderBy('month')
             ->get();

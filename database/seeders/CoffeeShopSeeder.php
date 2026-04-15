@@ -15,6 +15,7 @@ class CoffeeShopSeeder extends Seeder
         // 0. Users
         \App\Models\User::create([
             'name' => 'Admin Coffee',
+            'username' => 'admin',
             'email' => 'admin@coffee.com',
             'password' => \Illuminate\Support\Facades\Hash::make('password'),
             'role' => 'admin',
@@ -22,6 +23,7 @@ class CoffeeShopSeeder extends Seeder
 
         \App\Models\User::create([
             'name' => 'Staff Coffee',
+            'username' => 'staff',
             'email' => 'staff@coffee.com',
             'password' => \Illuminate\Support\Facades\Hash::make('password'),
             'role' => 'staff',
