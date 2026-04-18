@@ -57,6 +57,7 @@ class DashboardController extends Controller
     public function statistics(Request $request)
     {
         $year = $request->get('year', date('Y'));
+        $weekDate = $request->get('week_date', date('Y-m-d')); // For weekly view
         
         // 1. Revenue Statistics (Month, Quarter, Year)
         $monthlyRevenue = Order::where('status', 'completed')
@@ -81,7 +82,23 @@ class DashboardController extends Controller
             ->whereYear('updated_at', $year)
             ->sum('total_amount');
 
-        // 2. Product Statistics (Quantity Sold + Best Sellers)
+        // 2. Weekly Revenue Statistics (Monday to Sunday)
+        $currentWeekStart = \Carbon\Carbon::parse($weekDate)->startOfWeek();
+        $currentWeekEnd = $currentWeekStart->copy()->endOfWeek();
+        
+        $dailyRevenue = Order::where('status', 'completed')
+            ->whereBetween('updated_at', [$currentWeekStart, $currentWeekEnd])
+            ->select(
+                DB::raw('DAYOFWEEK(updated_at) as day_of_week'),
+                DB::raw('DATE(updated_at) as date'),
+                DB::raw('SUM(total_amount) as total'),
+                DB::raw('COUNT(*) as count')
+            )
+            ->groupBy('date', 'day_of_week')
+            ->orderBy('date')
+            ->get();
+
+        // 3. Product Statistics (Quantity Sold + Best Sellers)
         $productStats = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_sold'), DB::raw('SUM(quantity * order_items.price) as total_revenue'))
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->where('orders.status', 'completed')
@@ -91,7 +108,7 @@ class DashboardController extends Controller
             ->with('product')
             ->get();
 
-        // 3. Potential Customers (Based on name/phone since we don't have separate table)
+        // 4. Potential Customers (Based on name/phone since we don't have separate table)
         // Analyzing "customer_name" or "customer_phone"
         $topCustomers = Order::where('status', 'completed')
             ->whereNotNull('customer_name')
@@ -105,9 +122,13 @@ class DashboardController extends Controller
             'monthlyRevenue', 
             'quarterlyRevenue', 
             'yearlyRevenue', 
+            'dailyRevenue',
             'productStats', 
             'topCustomers',
-            'year'
+            'year',
+            'weekDate',
+            'currentWeekStart',
+            'currentWeekEnd'
         ));
     }
 }
