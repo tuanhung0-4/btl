@@ -1,34 +1,38 @@
 @extends('layouts.master')
 
 @section('content')
-<div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <div>
-            <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--dark);">Quản lý tài khoản</h3>
-            <p style="color: var(--secondary); font-size: 0.9rem;">Danh sách và phân quyền người dùng trong hệ thống.</p>
-        </div>
-        <a href="{{ route('users.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Thêm tài khoản mới
-        </a>
+<!-- Header Section -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <p style="color: var(--color-gray-500); font-size: 0.95rem; margin: 0;">Danh sách và phân quyền người dùng trong hệ thống.</p>
     </div>
+    <a href="{{ route('users.create') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Thêm tài khoản
+    </a>
+</div>
 
-    <!-- Search Section (Admin Only - though this page is already admin-only) -->
-    <div style="background: #f8fafc; padding: 1.5rem; border-radius: 1rem; margin-bottom: 2rem; border: 1px solid #e2e8f0;">
-        <form action="{{ route('users.index') }}" method="GET" style="display: flex; gap: 1rem;">
-            <div style="flex-grow: 1; position: relative;">
-                <i class="fas fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+<!-- Search Section -->
+<div class="card mb-4" style="margin-bottom: 1.5rem;">
+    <form action="{{ route('users.index') }}" method="GET" style="display: flex; gap: 1rem; align-items: flex-end;">
+        <div style="flex-grow: 1;">
+            <label class="fw-semi-bold mb-2" style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Tìm kiếm</label>
+            <div style="position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-gray-400);"></i>
                 <input type="text" name="search" value="{{ request('search') }}" 
-                    placeholder="Tìm kiếm theo tên hoặc email..." 
-                    style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; outline: none; transition: all 0.2s;">
+                    placeholder="Tìm theo tên hoặc email..." 
+                    style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--color-gray-300); border-radius: var(--radius); font-size: 0.9rem;">
             </div>
-            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-            @if(request('search'))
-                <a href="{{ route('users.index') }}" class="btn" style="background: #e2e8f0; color: #475569;">Xóa lọc</a>
-            @endif
-        </form>
-    </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+        @if(request('search'))
+            <a href="{{ route('users.index') }}" class="btn btn-secondary">Xóa</a>
+        @endif
+    </form>
+</div>
 
-    <div style="overflow-x: auto;">
+<!-- Users Table -->
+<div class="card">
+    <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
@@ -36,28 +40,35 @@
                     <th>Họ và tên</th>
                     <th>Tên đăng nhập</th>
                     <th>Email</th>
-                    <th>Vai trò</th>
-                    <th>Ngày tạo</th>
+                    <th style="text-align: center;">Vai trò</th>
+                    <th style="text-align: center;">Ngày tạo</th>
                     <th style="text-align: right;">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($users as $user)
                 <tr>
-                    <td>#{{ $user->id }}</td>
-                    <td style="font-weight: 500;">{{ $user->name }}</td>
-                    <td><code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">{{ $user->username }}</code></td>
-                    <td>{{ $user->email }}</td>
+                    <td><strong>#{{ $user->id }}</strong></td>
                     <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 35px; height: 35px; background: var(--color-accent-yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--color-dark); font-size: 0.9rem;">
+                                {{ strtoupper(substr($user->name, 0, 1)) }}
+                            </div>
+                            <strong>{{ $user->name }}</strong>
+                        </div>
+                    </td>
+                    <td><code style="background: var(--color-gray-100); padding: 4px 8px; border-radius: 4px;">{{ $user->username }}</code></td>
+                    <td style="font-size: 0.9rem; color: var(--color-gray-600);">{{ $user->email }}</td>
+                    <td style="text-align: center;">
                         @if($user->role === 'admin')
-                            <span class="badge badge-success" style="background: #dbeafe; color: #1e40af;">Quản trị viên</span>
+                            <span class="badge badge-primary"><i class="fas fa-crown"></i> Admin</span>
                         @else
-                            <span class="badge badge-warning" style="background: #fef3c7; color: #92400e;">Nhân viên</span>
+                            <span class="badge badge-info"><i class="fas fa-user"></i> Nhân viên</span>
                         @endif
                     </td>
-                    <td style="color: var(--secondary); font-size: 0.85rem;">{{ $user->created_at->format('d/m/Y') }}</td>
-                    <td style="text-align: right; display: flex; justify-content: flex-end; gap: 0.5rem;">
-                        <a href="{{ route('users.edit', $user) }}" class="btn" style="background: #f1f5f9; color: #475569; padding: 0.4rem 0.8rem;">
+                    <td style="text-align: center; color: var(--color-gray-500); font-size: 0.85rem;">{{ $user->created_at->format('d/m/Y') }}</td>
+                    <td style="text-align: right;">
+                        <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-outline"
                             <i class="fas fa-edit"></i>
                         </a>
                         @if($user->id !== Auth::id())

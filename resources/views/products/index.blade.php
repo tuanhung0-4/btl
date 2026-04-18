@@ -1,45 +1,60 @@
 @extends('layouts.master')
 
 @section('content')
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<!-- Header Section -->
+<div class="d-flex justify-content-between" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
     <div>
-        <h2 style="font-size: 1.5rem; font-weight: 700;">Quản lý thực đơn</h2>
-        <p style="color: #64748b; font-size: 0.875rem;">Danh sách tất cả các món ăn trong quán.</p>
+        <p style="color: var(--color-gray-500); font-size: 0.95rem; margin: 0;">Danh sách tất cả các sản phẩm trong quán.</p>
     </div>
     <div style="display: flex; gap: 0.75rem;">
-        <a href="{{ route('products.trash') }}" class="btn" style="background: #f1f5f9; color: #475569;">
+        <a href="{{ route('products.trash') }}" class="btn btn-secondary">
             <i class="fas fa-trash-alt"></i> Thùng rác
         </a>
         <a href="{{ route('products.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Thêm món mới
+            <i class="fas fa-plus"></i> Thêm sản phẩm
         </a>
     </div>
 </div>
 
-<div class="card" style="padding: 1rem;">
-    <form action="{{ route('products.index') }}" method="GET" style="display: flex; gap: 1rem; flex-wrap: wrap;">
-        <div style="flex-grow: 1; position: relative;">
-            <i class="fas fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
-            <input type="text" name="search" placeholder="Tìm theo tên..." value="{{ request('search') }}" style="width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+<!-- Filter Section -->
+<div class="card mb-4" style="margin-bottom: 1.5rem;">
+    <form action="{{ route('products.index') }}" method="GET" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+        <div style="flex-grow: 1;">
+            <label class="fw-semi-bold mb-2" style="display: block; margin-bottom: 0.5rem;">Tìm kiếm</label>
+            <div style="position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-gray-400);"></i>
+                <input type="text" name="search" placeholder="Nhập tên sản phẩm..." value="{{ request('search') }}" style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--color-gray-300); border-radius: var(--radius); font-size: 0.9rem;">
+            </div>
         </div>
-        <select name="category_id" style="padding: 0.6rem 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; background: white;">
-            <option value="">Tất cả danh mục</option>
-            @foreach($categories as $category)
-                <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-            @endforeach
-        </select>
-        <select name="sort" style="padding: 0.6rem 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; background: white;">
-            <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Giá cao đến thấp</option>
-            <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>Giá thấp đến cao</option>
-        </select>
-        <button type="submit" class="btn btn-primary">Lọc</button>
+        <div>
+            <label class="fw-semi-bold mb-2" style="display: block; margin-bottom: 0.5rem;">Danh mục</label>
+            <select name="category_id" style="padding: 0.75rem 1rem; border: 1px solid var(--color-gray-300); border-radius: var(--radius); background: white; font-size: 0.9rem; cursor: pointer;">
+                <option value="">Tất cả danh mục</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <label class="fw-semi-bold mb-2" style="display: block; margin-bottom: 0.5rem;">Sắp xếp</label>
+            <select name="sort" style="padding: 0.75rem 1rem; border: 1px solid var(--color-gray-300); border-radius: var(--radius); background: white; font-size: 0.9rem; cursor: pointer;">
+                <option value="desc" {{ request('sort') == 'desc' ? 'selected' : '' }}>Giá cao đến thấp</option>
+                <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>Giá thấp đến cao</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-filter"></i> Lọc
+        </button>
         @if(request()->hasAny(['search', 'category_id', 'sort']))
-            <a href="{{ route('products.index') }}" class="btn" style="background: #f1f5f9;">Xóa lọc</a>
+            <a href="{{ route('products.index') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Xóa
+            </a>
         @endif
     </form>
 </div>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+<!-- Products Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
     @forelse($products as $product)
         @php 
             $rank = array_search($product->id, $topProductIds);
@@ -47,14 +62,14 @@
         @endphp
         <x-product-card :product="$product" :bestSellerRank="$bestSellerRank" />
     @empty
-        <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: white; border-radius: 1rem;">
-            <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" style="width: 120px; opacity: 0.5; margin-bottom: 1rem;">
-            <h3 style="color: #64748b;">Không tìm thấy món ăn nào</h3>
+        <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: var(--color-white); border-radius: var(--radius); border: 2px dashed var(--color-gray-300);">
+            <i class="fas fa-box-open" style="font-size: 3rem; color: var(--color-gray-300); margin-bottom: 1rem;"></i>
+            <h3 style="color: var(--color-gray-500); margin-bottom: 0.5rem;">Không tìm thấy sản phẩm</h3>
+            <p style="color: var(--color-gray-400); margin: 0;">Hãy thêm sản phẩm mới hoặc thay đổi bộ lọc</p>
         </div>
     @endforelse
 </div>
 
-<div style="margin-top: 2rem;">
-    {{ $products->appends(request()->query())->links() }}
-</div>
+<!-- Pagination -->
+{{ $products->appends(request()->query())->links() }}
 @endsection

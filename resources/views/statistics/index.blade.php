@@ -1,14 +1,14 @@
 @extends('layouts.master')
 
 @section('content')
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<!-- Filter Section -->
+<div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2 style="font-size: 1.5rem; font-weight: 700;">Thống kê</h2>
-        <p style="color: #64748b; font-size: 0.875rem;">Phân tích hoạt động kinh doanh của quán.</p>
+        <p style="color: var(--color-gray-500); font-size: 0.95rem; margin: 0;">Phân tích hoạt động kinh doanh của quán.</p>
     </div>
-    <form action="{{ route('statistics') }}" method="GET" style="display: flex; gap: 0.5rem; align-items: center;">
-        <label style="font-weight: 500; font-size: 0.9rem;">Năm:</label>
-        <select name="year" onchange="this.form.submit()" style="padding: 0.5rem 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; background: white;">
+    <form action="{{ route('statistics') }}" method="GET" class="d-flex gap-2" style="gap: 0.75rem;">
+        <label class="fw-semi-bold" style="font-size: 0.9rem; padding-top: 0.5rem;">Năm:</label>
+        <select name="year" onchange="this.form.submit()" style="padding: 0.625rem 1rem; border: 1px solid var(--color-gray-300); border-radius: var(--radius); background: white; font-size: 0.9rem; cursor: pointer;">
             @for($y = date('Y'); $y >= date('Y') - 5; $y--)
                 <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
             @endfor
@@ -16,29 +16,39 @@
     </form>
 </div>
 
-<!-- Weekly Chart Section -->
-<div class="card" style="margin-bottom: 2rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <h4 style="font-weight: 600;">Biểu đồ doanh thu & Đơn hàng theo ngày trong tuần</h4>
-        <form action="{{ route('statistics') }}" method="GET" style="display: flex; gap: 0.5rem; align-items: center;">
-            <input type="hidden" name="year" value="{{ $year }}">
-            <input type="date" name="week_date" value="{{ $weekDate }}" style="padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;">
-            <button type="submit" style="padding: 0.5rem 1rem; background: var(--primary); color: white; border: none; border-radius: 0.5rem; cursor: pointer;">Cập nhật</button>
-        </form>
+<!-- Weekly Stats Section -->
+<div class="card mb-4">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center" style="display: flex; justify-content: space-between;">
+            <div class="card-title">
+                <i class="fas fa-chart-line" style="color: var(--color-primary); margin-right: 0.5rem;"></i>
+                Doanh thu & Đơn hàng theo ngày
+            </div>
+            <form action="{{ route('statistics') }}" method="GET" class="d-flex gap-2" style="display: flex; gap: 0.75rem; align-items: center;">
+                <input type="hidden" name="year" value="{{ $year }}">
+                <input type="date" name="week_date" value="{{ $weekDate }}" style="padding: 0.625rem 0.75rem; border: 1px solid var(--color-gray-300); border-radius: var(--radius); font-size: 0.9rem;">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fas fa-sync-alt"></i> Cập nhật
+                </button>
+            </form>
+        </div>
     </div>
-    <div style="height: 350px;">
+    <div style="height: 350px; margin-top: 1.5rem;">
         <canvas id="dailyRevenueChart"></canvas>
     </div>
 </div>
 
-<!-- Daily Revenue Grid -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-    <!-- Daily Revenue Card -->
+<!-- Daily Revenue Stats -->
+<div class="grid grid-2 mb-4">
+    <!-- Daily Revenue Table -->
     <div class="card">
-        <h4 style="margin-bottom: 1.5rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-calendar-week" style="color: var(--primary);"></i> Chi tiết theo ngày trong tuần
-        </h4>
-        <div style="height: 300px; overflow-y: auto;">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="fas fa-calendar-week" style="color: var(--color-primary); margin-right: 0.5rem;"></i>
+                Chi tiết theo ngày trong tuần
+            </div>
+        </div>
+        <div class="table-wrapper">
             <table>
                 <thead>
                     <tr>
@@ -78,16 +88,18 @@
 
     <!-- Weekly Summary -->
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-        <div class="card" style="background: var(--primary); color: white;">
-            <p style="opacity: 0.8; font-size: 0.9rem; margin-bottom: 0.5rem;">Doanh thu tuần ({{ $currentWeekStart->format('d/m') }} - {{ $currentWeekEnd->format('d/m') }})</p>
-            <h2 style="font-size: 2.2rem; font-weight: 700;">{{ number_format($dailyRevenue->sum('total'), 0, ',', '.') }}đ</h2>
+        <div class="card card-primary stat-box">
+            <p class="stat-label">Doanh thu tuần ({{ $currentWeekStart->format('d/m') }} - {{ $currentWeekEnd->format('d/m') }})</p>
+            <p class="stat-value">{{ number_format($dailyRevenue->sum('total'), 0, ',', '.') }}đ</p>
         </div>
 
-        <div class="card" style="flex-grow: 1;">
-            <h4 style="margin-bottom: 1.5rem; font-weight: 600;">Thống kê tuần</h4>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Thống kê tuần</div>
+            </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div style="padding: 1.5rem; background: #f8fafc; border-radius: 0.75rem; text-align: center; border: 1px solid #e2e8f0;">
-                    <p style="color: #64748b; font-size: 0.8rem; margin-bottom: 0.5rem;">Tổng đơn hàng</p>
+                <div style="padding: 1.5rem; background: var(--color-accent-yellow); border-radius: var(--radius); text-align: center;">
+                    <p style="color: #666; font-size: 0.8rem; margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">Tổng đơn</p>
                     <p style="font-weight: 700; font-size: 1.1rem; color: var(--dark);">{{ $dailyRevenue->sum('count') }}</p>
                 </div>
                 <div style="padding: 1.5rem; background: #f8fafc; border-radius: 0.75rem; text-align: center; border: 1px solid #e2e8f0;">

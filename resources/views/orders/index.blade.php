@@ -1,54 +1,56 @@
 @extends('layouts.master')
 
 @section('content')
+<!-- Header Section -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
     <div>
-        <h2 style="font-size: 1.5rem; font-weight: 700;">Quản lý đơn hàng</h2>
-        <p style="color: #64748b; font-size: 0.875rem;">Tìm kiếm và lọc các đơn hàng của quán.</p>
+        <p style="color: var(--color-gray-500); font-size: 0.95rem; margin: 0;">Tìm kiếm và lọc các đơn hàng của quán.</p>
     </div>
     <a href="{{ route('orders.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Tạo đơn hàng mới
+        <i class="fas fa-plus"></i> Tạo đơn hàng
     </a>
 </div>
 
 <!-- Filters Section -->
-<div class="card" style="margin-bottom: 1.5rem; padding: 1.5rem;">
-    <form action="{{ route('orders.index') }}" method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+<div class="card mb-4" style="margin-bottom: 1.5rem;">
+    <form action="{{ route('orders.index') }}" method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: flex-end;">
         <div>
-            <label style="display: block; margin-bottom: 0.4rem; font-size: 0.85rem; color: #64748b;">Mã đơn hàng</label>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="#ID..." 
-                style="width: 100%; padding: 0.6rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; outline: none;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem;">Mã / Khách hàng</label>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Tìm mã hoặc tên..." 
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-gray-300); border-radius: var(--radius); font-size: 0.9rem;">
         </div>
         <div>
-            <label style="display: block; margin-bottom: 0.4rem; font-size: 0.85rem; color: #64748b;">Từ ngày</label>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem;">Từ ngày</label>
             <input type="date" name="start_date" value="{{ request('start_date') }}" 
-                style="width: 100%; padding: 0.6rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; outline: none;">
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-gray-300); border-radius: var(--radius); font-size: 0.9rem;">
         </div>
         <div>
-            <label style="display: block; margin-bottom: 0.4rem; font-size: 0.85rem; color: #64748b;">Đến ngày</label>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem;">Đến ngày</label>
             <input type="date" name="end_date" value="{{ request('end_date') }}" 
-                style="width: 100%; padding: 0.6rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; outline: none;">
+                style="width: 100%; padding: 0.75rem; border: 1px solid var(--color-gray-300); border-radius: var(--radius); font-size: 0.9rem;">
         </div>
         <div style="display: flex; gap: 0.5rem;">
-            <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">
                 <i class="fas fa-filter"></i> Lọc
             </button>
-            <a href="{{ route('orders.index') }}" class="btn" style="background: #e2e8f0; color: #475569;">Xóa</a>
+            <a href="{{ route('orders.index') }}" class="btn btn-secondary">Xóa</a>
         </div>
     </form>
 </div>
 
+<!-- Orders Table -->
 <div class="card">
     @if($orders->count() > 0)
-    <div style="overflow-x: auto;">
+    <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
                     <th>Mã đơn</th>
                     <th>Bàn</th>
-                    <th>Tổng tiền</th>
-                    <th>Trạng thái</th>
-                    <th>Ngày tạo</th>
+                    <th>Khách hàng</th>
+                    <th style="text-align: right;">Tổng tiền</th>
+                    <th style="text-align: center;">Trạng thái</th>
+                    <th style="text-align: center;">Ngày tạo</th>
                     <th style="text-align: right;">Thao tác</th>
                 </tr>
             </thead>
@@ -56,8 +58,22 @@
                 @foreach($orders as $order)
                 <tr>
                     <td><strong>#{{ $order->id }}</strong></td>
-                    <td>{{ $order->table ? $order->table->name : 'N/A' }}</td>
-                    <td style="font-weight: 600; color: var(--primary);">{{ number_format($order->total_amount, 0, ',', '.') }}đ</td>
+                    <td>
+                        @if($order->table)
+                            <span class="badge badge-primary">{{ $order->table->name }}</span>
+                        @else
+                            <span style="color: var(--color-gray-400);">-</span>
+                        @endif
+                    </td>
+                    <td>
+                        <div>
+                            <strong>{{ $order->customer_name ?? 'N/A' }}</strong>
+                            @if($order->customer_phone)
+                                <p style="font-size: 0.8rem; color: var(--color-gray-500); margin: 0;">{{ $order->customer_phone }}</p>
+                            @endif
+                        </div>
+                    </td>
+                    <td style="font-weight: 600; color: var(--color-primary); text-align: right;">{{ number_format($order->total_amount, 0, ',', '.') }}đ</td>
                     <td>
                         <span class="badge {{ $order->status === 'completed' ? 'badge-success' : ($order->status === 'pending' ? 'badge-warning' : 'badge-danger') }}">
                             {{ $order->status === 'completed' ? 'Đã thanh toán' : ($order->status === 'pending' ? 'Chưa thanh toán' : 'Đã hủy') }}
