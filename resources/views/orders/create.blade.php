@@ -1,15 +1,15 @@
-@extends('layouts.master')
+@extends('layouts.master') #Kế thừa layout chính từ file layouts/master.blade.php
 
-@section('content')
-<div style="max-width: 1000px; margin: 0 auto;">
-    <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem;">Tạo đơn hàng mới</h2>
+@section('content') #Bắt đầu phần nội dung chính của trang, sẽ được chèn vào layout master
+<div style="max-width: 1000px; margin: 0 auto;"> #tạo khung giữa trang với chiều rộng tối đa 1000px
+    <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem;">Tạo đơn hàng mới</h2> #tiêu đề của trang tạo đơn hàng
 
-    <form action="{{ route('orders.store') }}" method="POST">
-        @csrf
-        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+    <form action="{{ route('orders.store') }}" method="POST"> #form gửi dữ liệu đến route orders.store để tạo đơn hàng mới
+        @csrf #để bảo vệ form khỏi tấn công giả mạo 
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;"> chia layout thành 2 
             <!-- Cột trái: Chọn bàn -->
             <div class="card">
-                <h4 style="margin-bottom: 1.5rem; font-weight: 600;">1. Thông tin khách hàng</h4>
+                <h4 style="margin-bottom: 1.5rem; font-weight: 600;">1. Thông tin khách hàng</h4> #tiêu đề phần thông tin khách hàng
                 <div style="margin-bottom: 1rem;">
                     <label style="display: block; margin-bottom: 0.4rem; font-size: 0.85rem; color: #64748b;">Tên khách hàng</label>
                     <input type="text" name="customer_name" placeholder="Ví dụ: Anh Tuấn" style="width: 100%; padding: 0.6rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; outline: none;">
@@ -87,7 +87,7 @@
 
 @push('scripts')
 <script>
-    function filterProducts(categoryId, btn) {
+    function filterProducts(categoryId, btn) { #dùng để lọc sản phẩm theo danh mục
         // Update active button
         const buttons = btn.parentElement.querySelectorAll('button');
         buttons.forEach(b => {
@@ -108,5 +108,5 @@
         });
     }
 </script>
-@endpush
-@endsection
+@endpush #kết thúc phần script và sẽ được chèn vào layout master
+@endsection #kết thúc phần nội dung chính của trang và sẽ được chèn vào layout master

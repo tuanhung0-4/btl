@@ -9,6 +9,62 @@ Dự án quản lý quán Cafe chuyên nghiệp được xây dựng trên nền
 - **Quản lý bàn**: Trạng thái bàn trống/có khách.
 - **Xử lý đơn hàng**: Tạo đơn, tính tiền tự động và hoàn tất thanh toán.
 
+## 📊 Dashboard
+Dashboard và sidebar được tạo bởi các file chính sau:
+- `routes/web.php`: định nghĩa tất cả route cho trang chủ, tài khoản, danh mục, sản phẩm, bàn, đơn hàng và thống kê.
+- `app/Http/Controllers/DashboardController.php`: trả dữ liệu cho trang chủ dashboard và trang thống kê.
+- `resources/views/layouts/master.blade.php`: layout chung chứa sidebar, header và vùng nội dung chính.
+- `resources/views/dashboard.blade.php`: nội dung trang chủ dashboard.
+- `public/css/imaji-style.css`: style chung cho dashboard, sidebar và layout.
+
+### Các mục chính trên sidebar và file tạo nên chúng
+- `Trang chủ`
+  - Route: `GET /`
+  - Controller: `DashboardController@index`
+  - View: `resources/views/dashboard.blade.php`
+- `Tài khoản`
+  - Route resource: `users`
+  - Controller: `UserController`
+  - Views: `resources/views/users/index.blade.php`, `resources/views/users/create.blade.php`, `resources/views/users/edit.blade.php`
+- `Danh mục`
+  - Route resource: `categories`
+  - Controller: `CategoryController`
+  - Views: `resources/views/categories/index.blade.php`, `resources/views/categories/edit.blade.php`
+- `Sản phẩm`
+  - Route resource: `products`
+  - Controller: `ProductController`
+  - Views: `resources/views/products/index.blade.php`, `resources/views/products/create.blade.php`, `resources/views/products/edit.blade.php`, `resources/views/products/trash.blade.php`
+- `Bàn & Chỗ ngồi`
+  - Route resource: `tables`
+  - Controller: `TableController`
+  - Views: `resources/views/tables/index.blade.php`, `resources/views/tables/create.blade.php`, `resources/views/tables/edit.blade.php`
+- `Đơn hàng`
+  - Route resource: `orders`
+  - Controller: `OrderController`
+  - Views: `resources/views/orders/index.blade.php`, `resources/views/orders/create.blade.php`, `resources/views/orders/edit.blade.php`, `resources/views/orders/show.blade.php`
+- `Thống kê`
+  - Route: `GET /statistics`
+  - Controller: `DashboardController@statistics`
+  - View: `resources/views/statistics/index.blade.php`
+
+### Cấu tạo sidebar trong dashboard
+- Sidebar chính được tạo trong `resources/views/layouts/master.blade.php`.
+- Menu sidebar sử dụng các route và tên sau:
+  - `route('dashboard')` -> Trang chủ
+  - `route('users.index')` -> Tài khoản
+  - `route('categories.index')` -> Danh mục
+  - `route('products.index')` -> Sản phẩm
+  - `route('tables.index')` -> Bàn & Chỗ ngồi
+  - `route('orders.index')` -> Đơn hàng
+  - `route('statistics')` -> Thống kê
+- Khi chọn một mục, layout sẽ hiển thị view tương ứng trong `@yield('content')`.
+
+### Thành phần chính trên trang chủ dashboard
+- Thẻ thông tin tổng quan (stat cards): tổng doanh thu, tổng đơn, bàn có khách, số lượng món.
+- Bảng "Bán chạy nhất" dựa trên `OrderItem` và `Order`.
+- Khối "Doanh thu theo loại" tính toán doanh thu theo `Category`.
+- Header trên cùng hiển thị tên trang và lời chào người dùng.
+
 ## 🛠 Kỹ thuật áp dụng
 - **Eloquent Relationships**: belongsTo, hasMany.
 - **Advanced Query**: Eager Loading (`with`), Query Scopes (`available`, `priceRange`).

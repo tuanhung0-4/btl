@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layouts.master') 
 
 @section('content')
 <div style="max-width: 1000px; margin: 0 auto;">
@@ -89,7 +89,7 @@
 
 @push('scripts')
 <script>
-    function updateTableStyle(input) {
+    function updateTableStyle(input) { #khi người dùng chọn một bàn sẽ làm nổi bật bàn đó lên và làm mờ các bàn khác
         input.parentElement.parentElement.querySelectorAll('.table-card').forEach(el => {
             el.style.border = '1px solid #e2e8f0';
             el.style.background = 'white';

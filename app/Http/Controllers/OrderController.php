@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers; #Khai báo controller này thuộc namespace của Laravel
 
-use App\Http\Requests\OrderRequest;
+use App\Http\Requests\OrderRequest; #Sử dụng lớp OrderRequest để xử lý các yêu cầu liên quan đến đơn hàng
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Table;
 use App\Models\OrderItem;
-use App\Models\Category;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use App\Models\Category; #Import các model
+use Illuminate\Http\Request; #Nhận request từ khách hàng
+use Illuminate\Support\Facades\DB; #Sử dụng DB facade để thực hiện các giao dịch cơ sở dữ liệu
+use Carbon\Carbon; #Sử dụng Carbon để xử lý ngày tháng
 
-class OrderController extends Controller
+class OrderController extends Controller #Định nghĩa lớp OrderController kế thừa từ Controller của Laravel
 {
-    public function index(Request $request)
+    public function index(Request $request) #Hiển thị danh sách đơn hàng
     {
         $query = Order::with('table');
 
@@ -30,7 +30,7 @@ class OrderController extends Controller
                 Carbon::parse($request->end_date)->endOfDay()
             ]);
         }
-
+ 
         // Search by ID (Exact match for numeric, like search for string if applicable)
         if ($request->filled('search')) {
             $search = $request->search;
@@ -45,7 +45,7 @@ class OrderController extends Controller
         return view('orders.index', compact('orders'));
     }
 
-    public function create()
+    public function create() #Hiển thị form tạo đơn hàng mới
     {
         $tables = Table::all();
         $products = Product::available()->with('category')->get();
@@ -53,7 +53,7 @@ class OrderController extends Controller
         return view('orders.create', compact('tables', 'products', 'categories'));
     }
 
-    public function store(OrderRequest $request)
+    public function store(OrderRequest $request) #Xử lý lưu đơn hàng mới vào cơ sở dữ liệu
     {
         try {
             DB::beginTransaction();
@@ -103,18 +103,18 @@ class OrderController extends Controller
         }
     }
 
-    public function show(Order $order)
+    public function show(Order $order) #hiển thị chi tiết đơn hàng 
     {
         $order->load(['table', 'orderItems.product']);
         return view('orders.show', compact('order'));
     }
 
-    public function edit(Order $order)
+    public function edit(Order $order) #Hiển thị form sửa đơn hàng
     {
         if ($order->status !== 'pending') {
             return redirect()->route('orders.show', $order->id)->with('error', 'Không thể sửa đơn hàng đã hoàn tất hoặc đã hủy.');
         }
-
+  
         $tables = Table::all();
         $products = Product::available()->with('category')->get();
         $categories = Category::all();
@@ -123,7 +123,7 @@ class OrderController extends Controller
         return view('orders.edit', compact('order', 'tables', 'products', 'categories'));
     }
 
-    public function update(Request $request, Order $order)
+    public function update(Request $request, Order $order) #Xử lý cập nhật đơn hàng vào cơ sở dữ liệu
     {
         if ($order->status !== 'pending') {
             return redirect()->route('orders.show', $order->id)->with('error', 'Không thể sửa đơn hàng đã hoàn tất hoặc đã hủy.');
@@ -165,26 +165,26 @@ class OrderController extends Controller
         }
     }
 
-    public function complete(Order $order)
+    public function complete(Order $order) #Xử lý hoàn tất đơn hàng và cập nhật trạng thái bàn
     {
         $order->update(['status' => 'completed']);
-        $order->table->update(['status' => 'empty']);
+        $order->table()->update(['status' => 'empty']);
         
         return redirect()->route('orders.index')->with('success', 'Đơn hàng đã thanh toán và hoàn tất!');
     }
 
-    public function cancel(Order $order)
+    public function cancel(Order $order) #Xử lý hủy đơn hàng và cập nhật trạng thái bàn
     {
         $order->update(['status' => 'cancelled']);
-        $order->table->update(['status' => 'empty']);
+        $order->table()->update(['status' => 'empty']);
         
         return redirect()->route('orders.index')->with('success', 'Đơn hàng đã được hủy!');
     }
 
-    public function destroy(Order $order)
+    public function destroy(Order $order) #Xử lý xóa đơn hàng khỏi cơ sở dữ liệu
     {
         if ($order->status === 'pending') {
-            $order->table->update(['status' => 'empty']);
+            $order->table()->update(['status' => 'empty']);
         }
         $order->delete();
         return redirect()->route('orders.index')->with('success', 'Đã xóa đơn hàng!');
