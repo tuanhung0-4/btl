@@ -87,9 +87,10 @@
     </form>
 </div>
 
-@push('scripts')
-<script>
-    function updateTableStyle(input) { #khi người dùng chọn một bàn sẽ làm nổi bật bàn đó lên và làm mờ các bàn khác
+@push('scripts') 
+<!--khi người dùng chọn một bàn sẽ làm nổi bật bàn đó lên và làm mờ các bàn khác -->
+<script> 
+    function updateTableStyle(input) { 
         input.parentElement.parentElement.querySelectorAll('.table-card').forEach(el => {
             el.style.border = '1px solid #e2e8f0';
             el.style.background = 'white';

@@ -18,31 +18,31 @@ Dashboard và sidebar được tạo bởi các file chính sau:
 - `public/css/imaji-style.css`: style chung cho dashboard, sidebar và layout.
 
 ### Các mục chính trên sidebar và file tạo nên chúng
-- `Trang chủ`
+- `Trang chủ` H
   - Route: `GET /`
   - Controller: `DashboardController@index`
   - View: `resources/views/dashboard.blade.php`
-- `Tài khoản`
+- `Tài khoản` H
   - Route resource: `users`
   - Controller: `UserController`
   - Views: `resources/views/users/index.blade.php`, `resources/views/users/create.blade.php`, `resources/views/users/edit.blade.php`
-- `Danh mục`
+- `Danh mục` C
   - Route resource: `categories`
   - Controller: `CategoryController`
   - Views: `resources/views/categories/index.blade.php`, `resources/views/categories/edit.blade.php`
-- `Sản phẩm`
+- `Sản phẩm` H
   - Route resource: `products`
   - Controller: `ProductController`
   - Views: `resources/views/products/index.blade.php`, `resources/views/products/create.blade.php`, `resources/views/products/edit.blade.php`, `resources/views/products/trash.blade.php`
-- `Bàn & Chỗ ngồi`
+- `Bàn & Chỗ ngồi` T
   - Route resource: `tables`
   - Controller: `TableController`
   - Views: `resources/views/tables/index.blade.php`, `resources/views/tables/create.blade.php`, `resources/views/tables/edit.blade.php`
-- `Đơn hàng`
+- `Đơn hàng` T, C
   - Route resource: `orders`
   - Controller: `OrderController`
   - Views: `resources/views/orders/index.blade.php`, `resources/views/orders/create.blade.php`, `resources/views/orders/edit.blade.php`, `resources/views/orders/show.blade.php`
-- `Thống kê`
+- `Thống kê` H
   - Route: `GET /statistics`
   - Controller: `DashboardController@statistics`
   - View: `resources/views/statistics/index.blade.php`
