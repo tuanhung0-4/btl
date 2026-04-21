@@ -1,0 +1,9 @@
+THÀNH VIÊN          MODELS                      CONTROLLERS                                             VIEWS
+----------------------------------------------------------------------------------------------------------------------------------
+Nguyễn Tuấn Hưng    User/Dashboard, Product     DashboardController, UserController, ProductController  views/dashboard, views/products, View/User
+                                                AuthController
+
+Nguyễn Văn Tuyên    Table, Order                TableController, OrderController                        views/tables, views/orders, View/welcome
+
+Chu Văn Thắng       OrderItem, Category         OrderItemController, CategoryController                 views/dashboard, views/categories
+----------------------------------------------------------------------------------------------------------------------------------
