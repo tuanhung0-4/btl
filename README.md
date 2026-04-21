@@ -3,11 +3,14 @@
 Dự án quản lý quán Cafe chuyên nghiệp được xây dựng trên nền tảng Laravel, tuân thủ các quy chuẩn kỹ thuật hiện đại.
 
 ## 🚀 Tính năng chính
-- **Dashboard**: Thống kê doanh thu, món bán chạy, số lượng đơn hàng.
-- **Quản lý thực đơn**: CRUD sản phẩm, phân loại danh mục, lọc theo giá/tên.
-- **Thùng rác (Soft Delete)**: Khôi phục hoặc xóa vĩnh viễn món ăn.
-- **Quản lý bàn**: Trạng thái bàn trống/có khách.
-- **Xử lý đơn hàng**: Tạo đơn, tính tiền tự động và hoàn tất thanh toán.
+- **Xác thực người dùng**: Đăng nhập, đăng ký, đăng xuất với vai trò Admin và Staff.
+- **Quản lý người dùng**: CRUD tài khoản người dùng (chỉ dành cho Admin).
+- **Dashboard**: Thống kê doanh thu, món bán chạy, số lượng đơn hàng, trạng thái bàn.
+- **Quản lý danh mục**: CRUD danh mục sản phẩm (chỉ dành cho Admin).
+- **Quản lý sản phẩm**: CRUD sản phẩm với phân loại danh mục, lọc theo giá/tên, upload ảnh, trạng thái available/unavailable, thùng rác (Soft Delete) để khôi phục hoặc xóa vĩnh viễn.
+- **Quản lý bàn**: CRUD bàn và chỗ ngồi với trạng thái trống/có khách.
+- **Quản lý đơn hàng**: Tạo đơn hàng mới, thêm sản phẩm vào đơn, tính tiền tự động, hoàn tất thanh toán, hủy đơn hàng.
+- **Thống kê**: Báo cáo doanh thu theo danh mục, thống kê chi tiết (chỉ dành cho Admin).
 
 ## 📊 Dashboard
 Dashboard và sidebar được tạo bởi các file chính sau:
@@ -18,45 +21,45 @@ Dashboard và sidebar được tạo bởi các file chính sau:
 - `public/css/imaji-style.css`: style chung cho dashboard, sidebar và layout.
 
 ### Các mục chính trên sidebar và file tạo nên chúng
-- `Trang chủ` H
+- `Trang chủ` (Tất cả)
   - Route: `GET /`
   - Controller: `DashboardController@index`
   - View: `resources/views/dashboard.blade.php`
-- `Tài khoản` H
+- `Tài khoản` (Chỉ Admin)
   - Route resource: `users`
   - Controller: `UserController`
   - Views: `resources/views/users/index.blade.php`, `resources/views/users/create.blade.php`, `resources/views/users/edit.blade.php`
-- `Danh mục` C
+- `Danh mục` (Chỉ Admin)
   - Route resource: `categories`
   - Controller: `CategoryController`
   - Views: `resources/views/categories/index.blade.php`, `resources/views/categories/edit.blade.php`
-- `Sản phẩm` H
+- `Sản phẩm` (Tất cả: index/show; Admin: full CRUD + trash)
   - Route resource: `products`
   - Controller: `ProductController`
   - Views: `resources/views/products/index.blade.php`, `resources/views/products/create.blade.php`, `resources/views/products/edit.blade.php`, `resources/views/products/trash.blade.php`
-- `Bàn & Chỗ ngồi` T
+- `Bàn & Chỗ ngồi` (Tất cả)
   - Route resource: `tables`
   - Controller: `TableController`
   - Views: `resources/views/tables/index.blade.php`, `resources/views/tables/create.blade.php`, `resources/views/tables/edit.blade.php`
-- `Đơn hàng` T, C
+- `Đơn hàng` (Tất cả: full CRUD + complete/cancel)
   - Route resource: `orders`
   - Controller: `OrderController`
   - Views: `resources/views/orders/index.blade.php`, `resources/views/orders/create.blade.php`, `resources/views/orders/edit.blade.php`, `resources/views/orders/show.blade.php`
-- `Thống kê` H
+- `Thống kê` (Chỉ Admin)
   - Route: `GET /statistics`
   - Controller: `DashboardController@statistics`
   - View: `resources/views/statistics/index.blade.php`
 
 ### Cấu tạo sidebar trong dashboard
 - Sidebar chính được tạo trong `resources/views/layouts/master.blade.php`.
-- Menu sidebar sử dụng các route và tên sau:
-  - `route('dashboard')` -> Trang chủ
-  - `route('users.index')` -> Tài khoản
-  - `route('categories.index')` -> Danh mục
-  - `route('products.index')` -> Sản phẩm
-  - `route('tables.index')` -> Bàn & Chỗ ngồi
-  - `route('orders.index')` -> Đơn hàng
-  - `route('statistics')` -> Thống kê
+- Menu sidebar sử dụng các route và tên sau, với quyền truy cập dựa trên vai trò:
+  - `route('dashboard')` -> Trang chủ (Tất cả)
+  - `route('users.index')` -> Tài khoản (Chỉ Admin)
+  - `route('categories.index')` -> Danh mục (Chỉ Admin)
+  - `route('products.index')` -> Sản phẩm (Tất cả)
+  - `route('tables.index')` -> Bàn & Chỗ ngồi (Tất cả)
+  - `route('orders.index')` -> Đơn hàng (Tất cả)
+  - `route('statistics')` -> Thống kê (Chỉ Admin)
 - Khi chọn một mục, layout sẽ hiển thị view tương ứng trong `@yield('content')`.
 
 ### Thành phần chính trên trang chủ dashboard
@@ -64,14 +67,6 @@ Dashboard và sidebar được tạo bởi các file chính sau:
 - Bảng "Bán chạy nhất" dựa trên `OrderItem` và `Order`.
 - Khối "Doanh thu theo loại" tính toán doanh thu theo `Category`.
 - Header trên cùng hiển thị tên trang và lời chào người dùng.
-
-## 🛠 Kỹ thuật áp dụng
-- **Eloquent Relationships**: belongsTo, hasMany.
-- **Advanced Query**: Eager Loading (`with`), Query Scopes (`available`, `priceRange`).
-- **Validation**: Form Request chuyên biệt.
-- **Blade Component**: Alert, Badge, Product Card tái sử dụng.
-- **UI/UX**: Thiết kế Premium với Google Fonts (Outfit) và CSS hiện đại.
-
 ## 📦 Cài đặt
 1. Clone dự án.
 2. Sao chép `.env.coffee` thành `.env`.
@@ -87,13 +82,6 @@ Dashboard và sidebar được tạo bởi các file chính sau:
    ```bash
    php artisan serve
    ```
-
-## 📂 Cấu trúc logic chuyển đổi
-- `Category` (Danh mục) <- Thay thế Course Category.
-- `Product` (Sản phẩm) <- Thay thế Course.
-- `Table` (Bàn) <- Thực thể quản lý vị trí.
-- `Order` (Đơn hàng) <- Thay thế Enrollment.
-- `OrderItem` (Chi tiết) <- Thay thế Lesson (Chi tiết từng món).
 
 ## 🧩 Mô hình MVC và tương tác
 Trong dự án này, mọi yêu cầu người dùng đều đi qua 4 thành phần chính:
